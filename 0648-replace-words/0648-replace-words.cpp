@@ -1,40 +1,50 @@
+class TrieNode {
+public:
+    vector<TrieNode*> children;
+    bool isEnd;
+
+    TrieNode() : children(26), isEnd(false) {}
+};
+
 class Solution {
 public:
     string replaceWords(vector<string>& dictionary, string sentence) {
-        sort(dictionary.begin(), dictionary.end());
-        set<string> dict;
-        for (auto&d : dictionary) {
-            dict.insert(d);
+        TrieNode* root = new TrieNode();
+        buildTrie(root, dictionary);
+
+        stringstream ss(sentence);
+        string word, result;
+        while (ss >> word) {
+            result += getRoot(root, word) + " ";
         }
-        vector<string> words;
-        int flag = 0;
-        string word = "";
-        for (int i = 0; i < sentence.size(); ++i) {
-            if (sentence[i] == ' ') {
-                if (flag == 0) words.push_back(word);
-                word = "";
-                flag = 0;
-            } else {
-                word = word + sentence[i];
-                if (dict.find(word) != dict.end() && flag == 0) {
-                    words.push_back(word);
-                    flag = 1;
-                    word = "";
+
+        result.pop_back();
+        return result;
+    }
+
+    void buildTrie(TrieNode* root, vector<string>& dictionary) {
+        for (const string& word : dictionary) {
+            TrieNode* node = root;
+            for (char c : word) {
+                if (!node->children[c - 'a']) {
+                    node->children[c - 'a'] = new TrieNode();
                 }
+                node = node->children[c - 'a'];
             }
-            if (i == sentence.size() - 1 && word != "" && flag == 0) {
-                words.push_back(word);
-            }
+            node->isEnd = true;
         }
-        string ans = "";
-        for (int i = 0; i < words.size(); ++i) {
-            if (i != words.size() - 1) {
-                ans = ans + words[i] + " ";
+    }
+
+    string getRoot(TrieNode* root, const string& word) {
+        TrieNode* node = root;
+        string rootWord;
+        for (char c : word) {
+            if (!node->children[c - 'a'] || node->isEnd) {
+                break;
             }
-            else {
-                ans = ans + words[i];
-            }
+            node = node->children[c - 'a'];
+            rootWord += c;
         }
-        return ans;
+        return node->isEnd ? rootWord : word;
     }
 };
