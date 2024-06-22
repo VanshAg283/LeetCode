@@ -19,12 +19,13 @@ public:
         if (m[1] < k) {
             return 0;
         }
+        int id = 0;
         int ct = 0;
         for (int i = 0; i < nums.size(); ++i) {
-            ct += odd[k] - odd[k - 1];
+            ct += odd[k + id] - odd[k + id - 1];
             if (nums[i] % 2) {
                 m[1]--;
-                odd.erase(odd.begin());
+                id++;
             }
             if (m[1] < k) {
                 break;
