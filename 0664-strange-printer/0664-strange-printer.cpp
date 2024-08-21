@@ -1,16 +1,5 @@
 class Solution {
 public:
-    int helper(string s, int start, int end, vector<vector<int>>& dp) {
-        if (start > end) return 0;
-        if (dp[start][end] != -1) return dp[start][end];
-        int num = 1 + helper(s, start + 1, end, dp);
-        for (int i = start + 1; i <= end; ++i) {
-            if (s[start] == s[i]) {
-                num = min(num, helper(s, start, i - 1, dp) + helper(s, i + 1, end, dp));
-            }
-        }
-        return dp[start][end] = num;
-    }
     int strangePrinter(string s) {
         string mod;
         mod += s[0];
@@ -18,8 +7,25 @@ public:
             if (s[i] != s[i - 1])
                 mod += s[i];
         }
+
         int n = mod.length();
-        vector<vector<int>> dp(n, vector<int>(n, -1));
-        return helper(mod, 0, n - 1, dp);
+        vector<vector<int>> dp(n, vector<int>(n, 0));
+
+        for (int i = 0; i < n; ++i) {
+            dp[i][i] = 1;
+        }
+
+        for (int length = 2; length <= n; ++length) {
+            for (int i = 0; i <= n - length; ++i) {
+                int j = i + length - 1;
+                dp[i][j] = dp[i + 1][j] + 1;
+                for (int k = i + 1; k <= j; ++k) {
+                    if (mod[i] == mod[k]) {
+                        dp[i][j] = min(dp[i][j], dp[i + 1][k - 1] + dp[k][j]);
+                    }
+                }
+            }
+        }
+        return dp[0][n - 1];
     }
 };
